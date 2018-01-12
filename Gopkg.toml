@@ -35,3 +35,7 @@
 [[constraint]]
   name = "github.com/emicklei/go-restful"
   version = "2.4.0"
+
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  version = "0.8.0"

@@ -1,15 +1,9 @@
 package cmd
 
 import (
-	"log"
-
-	"os"
-
 	"bitbucket.org/uthark/yttrium/internal/rest"
 	"github.com/spf13/cobra"
 )
-
-var logger = log.New(os.Stdout, "", log.LstdFlags|log.Llongfile)
 
 var rootCmd = &cobra.Command{
 	Use:   "yttrium",

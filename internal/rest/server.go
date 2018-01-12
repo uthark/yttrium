@@ -1,15 +1,11 @@
 package rest
 
 import (
-	"log"
 	"net/http"
 
-	"os"
-
+	"bitbucket.org/uthark/yttrium/internal/prom"
 	"github.com/emicklei/go-restful"
 )
-
-var logger = log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 // Server is a HTTP server.
 type Server struct {
@@ -23,12 +19,25 @@ func NewServer() *Server {
 
 // Start creates RESTful container and starts  accepting HTTP requests.
 func (s *Server) Start() error {
-	logger.Println("Staring server...")
+	logger.Println("Starting server...")
+	restful.SetLogger(logger)
+	restful.DefaultResponseContentType(restful.MIME_JSON)
+
 	c := restful.NewContainer()
+	c.ServeMux = http.NewServeMux()
+
+	c.DoNotRecover(false)
+	c.RecoverHandler(recoveryHandler)
+	c.ServiceErrorHandler(serviceErrorHandler)
+	c.Handle("/", http.HandlerFunc(notFound))
+	c = c.Add(prom.NewService())
 
 	// TODO: Allow to override port.
-	server := &http.Server{Addr: ":8080", Handler: c}
+	server := &http.Server{
+		Addr:     ":8080",
+		Handler:  c,
+		ErrorLog: logger,
+	}
 
 	return server.ListenAndServe()
-
 }
