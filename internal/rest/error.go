@@ -37,7 +37,7 @@ func recoveryHandler(panicReason interface{}, httpWriter http.ResponseWriter) {
 }
 
 func serviceErrorHandler(err restful.ServiceError, req *restful.Request, resp *restful.Response) {
-	logger.Println(req.Request.URL, err.Code, err.Message)
+	logger.Println(req.Request.Method, req.Request.URL, err.Code, err.Message)
 	setContentTypeApplicationJSON(resp)
 	resp.WriteHeader(err.Code)
 }

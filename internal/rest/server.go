@@ -3,6 +3,7 @@ package rest
 import (
 	"net/http"
 
+	"bitbucket.org/uthark/yttrium/internal/mime"
 	"bitbucket.org/uthark/yttrium/internal/prom"
 	"github.com/emicklei/go-restful"
 )
@@ -22,6 +23,7 @@ func (s *Server) Start() error {
 	logger.Println("Starting server...")
 	restful.SetLogger(logger)
 	restful.DefaultResponseContentType(restful.MIME_JSON)
+	restful.RegisterEntityAccessor(mime.MediaTypeApplicationYaml, NewYamlReaderWriter(mime.MediaTypeApplicationYaml))
 
 	c := restful.NewContainer()
 	c.ServeMux = http.NewServeMux()
