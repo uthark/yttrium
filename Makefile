@@ -10,7 +10,7 @@ APP_SOURCES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: build
 build:
-	go build -i -v -ldflags="-X '$(importpath)/internal/version.Version=$(version)' -X '$(importpath)/internal/version.GitCommit=$(GITCOMMIT)' -X '$(importpath)/internal/version.BuildDate=$(BUILD_DATE)'" .
+	go build -i -v -ldflags="-s -w -X '$(importpath)/internal/version.Version=$(version)' -X '$(importpath)/internal/version.GitCommit=$(GITCOMMIT)' -X '$(importpath)/internal/version.BuildDate=$(BUILD_DATE)'" .
 
 .PHONY: codestyle
 codestyle: gofmt golint govet errcheck gocyclo goconst
@@ -54,3 +54,6 @@ test:
 .PHONY: update-project-dependencies
 update-project-dependencies:
 	dep ensure -update
+
+.PHONY: all
+all:  codestyle build build-docker
