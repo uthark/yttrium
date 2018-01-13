@@ -6,7 +6,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// Register registers resource in restful container.
+// NewService return definition of the metrics service.
 func NewService() *restful.WebService {
 	ws := new(restful.WebService)
 
@@ -25,6 +25,7 @@ func NewService() *restful.WebService {
 	return ws
 }
 
+// MetricsREST is an implementation of Metrics REST endpoint.
 type MetricsREST struct{}
 
 // GetMetrics returns metrics.

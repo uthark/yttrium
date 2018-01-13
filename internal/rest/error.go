@@ -32,8 +32,14 @@ func recoveryHandler(panicReason interface{}, httpWriter http.ResponseWriter) {
 		Code:    http.StatusInternalServerError,
 		Message: fmt.Sprint(panicReason),
 	}
-	b, _ := json.Marshal(msg)
-	httpWriter.Write(b)
+	b, err := json.Marshal(msg)
+	if err != nil {
+		logger.Println("Unable to marshal object: ", err)
+	}
+	_, err = httpWriter.Write(b)
+	if err != nil {
+		logger.Println("Unable to send response: ", err)
+	}
 }
 
 func serviceErrorHandler(err restful.ServiceError, req *restful.Request, resp *restful.Response) {
