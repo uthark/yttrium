@@ -9,8 +9,8 @@ import (
 	"bitbucket.org/uthark/yttrium/internal/config"
 	"bitbucket.org/uthark/yttrium/internal/mime"
 	"bitbucket.org/uthark/yttrium/internal/prom"
+	taskrest "bitbucket.org/uthark/yttrium/internal/task/rest"
 	"github.com/emicklei/go-restful"
-	"github.com/kris-nova/kubicorn/cutil/task"
 )
 
 // Server is a HTTP server.
@@ -39,7 +39,7 @@ func (s *Server) Start() error {
 	c.Handle("/", http.HandlerFunc(notFound))
 	c.Filter(updateMetrics)
 	c = c.Add(prom.NewService())
-	c = c.Add(task.NewService())
+	c = c.Add(taskrest.NewService())
 
 	address := fmt.Sprintf(":%d", config.DefaultConfiguration().HTTPPort)
 	logger.Println("Staring listening on ", address)

@@ -1,4 +1,4 @@
-package dao
+package repo
 
 import (
 	"bitbucket.org/uthark/yttrium/internal/types"
@@ -18,7 +18,7 @@ type TaskRepositoryImpl struct {
 
 // Save saves a task into a database.
 func (t TaskRepositoryImpl) Save(task *types.Task) (*types.Task, error) {
-	return nil, nil
+	return task, nil
 }
 
 // List lists all tasks in a database.
