@@ -15,7 +15,7 @@ type TaskAPI struct {
 // NewTaskAPI creates new API to work with tasks.
 func NewTaskAPI() *TaskAPI {
 	return &TaskAPI{
-		repo: repo.NewTaskRepository(),
+		repo: repo.NewTaskRepository("localhost:27017"),
 	}
 }
 
