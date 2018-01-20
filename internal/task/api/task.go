@@ -32,3 +32,13 @@ func (api TaskAPI) SaveTask(t types.Task) (*types.Task, error) {
 func (api TaskAPI) ListTasks() ([]*types.Task, error) {
 	return api.repo.List()
 }
+
+// DeleteTask saves task.
+func (api TaskAPI) DeleteTask(taskID string) error {
+	return api.repo.Delete(taskID)
+}
+
+// GetTask saves task.
+func (api TaskAPI) GetTask(taskID string) (*types.Task, error) {
+	return api.repo.FindByID(taskID)
+}

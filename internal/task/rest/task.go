@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 
 	"bitbucket.org/uthark/yttrium/internal/mime"
@@ -8,6 +9,9 @@ import (
 	"bitbucket.org/uthark/yttrium/internal/types"
 	"github.com/emicklei/go-restful"
 )
+
+// TaskID is a constant for task-id
+const TaskID = "task-id"
 
 // NewService return definition of the metrics service.
 func NewService() *restful.WebService {
@@ -31,6 +35,18 @@ func NewService() *restful.WebService {
 		Doc("save task").
 		Operation("saveTask")
 	ws = ws.Route(saveTask)
+
+	deleteTask := ws.DELETE(fmt.Sprintf("/{%s}", TaskID)).To(rest.DeleteTask).
+		Doc("delete task").
+		Param(ws.PathParameter(TaskID, "Task ID")).
+		Operation("deleteTask")
+	ws = ws.Route(deleteTask)
+
+	getTask := ws.GET(fmt.Sprintf("/{%s}", TaskID)).To(rest.GetTask).
+		Doc("get task").
+		Param(ws.PathParameter(TaskID, "Task ID")).
+		Operation("getTask")
+	ws = ws.Route(getTask)
 
 	return ws
 }
@@ -95,4 +111,67 @@ func (t *TaskREST) SaveTask(req *restful.Request, resp *restful.Response) {
 	if err != nil {
 		logger.Println("Unable to send response", err)
 	}
+}
+
+// GetTask returns task with the given id.
+func (t *TaskREST) GetTask(req *restful.Request, resp *restful.Response) {
+	taskID := req.PathParameter(TaskID)
+	if taskID == "" {
+		err := resp.WriteHeaderAndEntity(http.StatusBadRequest, restful.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "Unable to get task",
+		})
+		if err != nil {
+			logger.Println("Unable to send response", err)
+		}
+	}
+
+	task, err := t.api.GetTask(taskID)
+	if err != nil {
+		logger.Println(err)
+		err = resp.WriteHeaderAndEntity(http.StatusBadRequest, restful.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "Unable to delete task",
+		})
+		if err != nil {
+			logger.Println("Unable to send response", err)
+		}
+		return
+	}
+
+	err = resp.WriteEntity(task)
+	if err != nil {
+		logger.Println("Unable to send response", err)
+	}
+
+}
+
+// DeleteTask deletes task.
+func (t *TaskREST) DeleteTask(req *restful.Request, resp *restful.Response) {
+	taskID := req.PathParameter(TaskID)
+	if taskID == "" {
+		err := resp.WriteHeaderAndEntity(http.StatusBadRequest, restful.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "Unable to delete task",
+		})
+		if err != nil {
+			logger.Println("Unable to send response", err)
+		}
+	}
+
+	err := t.api.DeleteTask(taskID)
+	if err != nil {
+		logger.Println(err)
+		err = resp.WriteHeaderAndEntity(http.StatusBadRequest, restful.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "Unable to delete task",
+		})
+		if err != nil {
+			logger.Println("Unable to send response", err)
+		}
+		return
+	}
+
+	resp.WriteHeader(http.StatusOK)
+
 }

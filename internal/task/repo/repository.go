@@ -25,6 +25,10 @@ type TaskRepository interface {
 	Save(t *types.Task) (*types.Task, error)
 	// List returns all tasks.
 	List() ([]*types.Task, error)
+	// Delete deletes task by id.
+	Delete(id string) error
+	// FindByID returns task with the given id.
+	FindByID(id string) (*types.Task, error)
 }
 
 // TaskRepositoryImpl is an implementation of task repository.
@@ -106,4 +110,23 @@ func (t TaskRepositoryImpl) getTaskCollection() (session *mgo.Session, collectio
 
 	collection = db.C(TaskCollection)
 	return session, collection
+}
+
+// Delete deletes task with the given id from the database.
+func (t TaskRepositoryImpl) Delete(id string) error {
+	logger.Println("Deleting task: ", id)
+	session, collection := t.getTaskCollection()
+	defer session.Close()
+
+	return collection.Remove(byID(id))
+}
+
+// FindByID returns task with the given ID.
+func (t TaskRepositoryImpl) FindByID(id string) (*types.Task, error) {
+	logger.Println("Find By ID task: ", id)
+	session, collection := t.getTaskCollection()
+	defer session.Close()
+	res := &types.Task{}
+	err := collection.Find(byID(id)).One(res)
+	return res, err
 }

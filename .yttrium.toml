@@ -1,3 +1,8 @@
-http-port= 2882
+# HTTP Port to listen.
+http-port= 8080
 
-database-url= "localhost:27018"
+# If set to true, all requests are logged.
+http-tracing = false
+
+# Database URL.
+database-url= "localhost:27017"

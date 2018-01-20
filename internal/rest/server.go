@@ -28,12 +28,8 @@ type Server struct {
 func NewServer() *Server {
 	return &Server{}
 }
-func (s *Server) Restart() {
-	logger.Println("Restarting server")
-	s.Stop()
-	go s.Start()
-}
 
+// Init initializes server.
 func (s *Server) Init(stop chan int) {
 	logger.Println("Configuring HTTP server.")
 
@@ -44,16 +40,6 @@ func (s *Server) Init(stop chan int) {
 	restful.DefaultResponseContentType(restful.MIME_JSON)
 	restful.RegisterEntityAccessor(mime.MediaTypeApplicationYaml, NewYamlReaderWriter(mime.MediaTypeApplicationYaml))
 
-}
-
-func (s *Server) Stop() {
-	logger.Println("Stopping server.")
-	ctx := context.TODO()
-	err := s.server.Shutdown(ctx)
-	if err != nil {
-		logger.Println(err)
-	}
-	logger.Println("Server stopped")
 }
 
 // Start creates RESTful container and starts  accepting HTTP requests.
@@ -70,6 +56,10 @@ func (s *Server) Start() {
 	c.ServiceErrorHandler(serviceErrorHandler)
 	c.Handle("/", http.HandlerFunc(notFound))
 	c.Filter(updateMetrics)
+	tracing := config.DefaultConfiguration().HTTPTracing
+	if tracing {
+		c.Filter(webserviceLogging)
+	}
 	c = c.Add(prom.NewService())
 	c = c.Add(taskrest.NewService())
 
@@ -85,6 +75,24 @@ func (s *Server) Start() {
 		logger.Println(err)
 	}
 
+}
+
+// Stop stops the server.
+func (s *Server) Stop() {
+	logger.Println("Stopping server.")
+	ctx := context.TODO()
+	err := s.server.Shutdown(ctx)
+	if err != nil {
+		logger.Println(err)
+	}
+	logger.Println("Server stopped")
+}
+
+// Restart performs server restart by stopping it and the by starting again.
+func (s *Server) Restart() {
+	logger.Println("Restarting server")
+	s.Stop()
+	go s.Start()
 }
 
 // webserviceLogging logs requested HTTP URL and method

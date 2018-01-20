@@ -4,6 +4,7 @@ package config
 type Configuration struct {
 	// HTTPPort is a port used for listening incoming HTTP traffic
 	HTTPPort           uint16 `mapstructure:"http-port"`
+	HTTPTracing        bool   `mapstructure:"http-tracing"`
 	DatabaseConnection string `mapstructure:"database-url"`
 }
 
