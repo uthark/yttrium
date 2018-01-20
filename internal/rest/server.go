@@ -1,9 +1,13 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"bitbucket.org/uthark/yttrium/internal/config"
@@ -49,6 +53,8 @@ func (s *Server) Start() error {
 		ErrorLog: logger,
 	}
 
+	s.setupSignalHandler(server)
+
 	return server.ListenAndServe()
 }
 
@@ -70,4 +76,29 @@ func updateMetrics(req *restful.Request, resp *restful.Response, chain *restful.
 	httpStatus := strconv.Itoa(resp.StatusCode())
 	prom.HTTPRequestsTotal.WithLabelValues(endpoint, method, httpStatus).Inc()
 	prom.HTTPRequestsDurationMilliseconds.WithLabelValues(endpoint, method, httpStatus).Observe(float64(durationMilliseconds))
+}
+
+// setupSignalHandler listens for syscall signals and stops HTTP server.
+func (s Server) setupSignalHandler(server *http.Server) {
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT)
+	go func() {
+		s := <-c
+		logger.Println("Got signal:", s)
+		if s == syscall.SIGTERM || s == syscall.SIGINT || s == os.Interrupt {
+			logger.Println("Safe Shutting down.")
+			ctx := context.Background()
+			err := server.Shutdown(ctx)
+			if err != nil {
+				logger.Println("Failed to shutdown server: ", err)
+			}
+		} else if s == syscall.SIGKILL {
+			logger.Println("Closing server.")
+			err := server.Close()
+			if err != nil {
+				logger.Println("Failed to forcibly close server: ", err)
+			}
+		}
+		os.Exit(2)
+	}()
 }

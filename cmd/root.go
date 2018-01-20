@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"bitbucket.org/uthark/yttrium/internal/rest"
 	"github.com/spf13/cobra"
 )
@@ -16,12 +18,15 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
+		logger.SetOutput(os.Stderr)
 		logger.Fatal(err)
+		os.Exit(-1)
 	}
+	os.Exit(0)
 
 }
 
-func startServer(cmd *cobra.Command, args []string) error {
+func startServer(_ *cobra.Command, _ []string) error {
 	server := rest.NewServer()
 	return server.Start()
 }
