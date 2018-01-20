@@ -8,10 +8,11 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "yttrium",
-	Short: "Microservice for...",
-	Long:  `Scaffold for microservice.`,
-	RunE:  startServer,
+	Use:          "yttrium",
+	Short:        "Microservice for...",
+	Long:         `Scaffold for microservice.`,
+	RunE:         startServer,
+	SilenceUsage: true,
 }
 
 // Execute executes the root command.
@@ -26,7 +27,19 @@ func Execute() {
 
 }
 
+var server = rest.NewServer()
+
 func startServer(_ *cobra.Command, _ []string) error {
-	server := rest.NewServer()
-	return server.Start()
+	stop := make(chan int)
+	server.Init(stop)
+
+	server.Start()
+
+	<-stop
+
+	return nil
+}
+
+func restartServer() {
+	server.Restart()
 }

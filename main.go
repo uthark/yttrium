@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"runtime"
 	"time"
@@ -9,6 +10,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
+
 	// Configure GOMAXPROCS.
 	runtime.GOMAXPROCS(runtime.NumCPU())
 

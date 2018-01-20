@@ -3,7 +3,8 @@ package config
 // Configuration is an app configuration
 type Configuration struct {
 	// HTTPPort is a port used for listening incoming HTTP traffic
-	HTTPPort uint16 `mapstructure:"http-port"`
+	HTTPPort           uint16 `mapstructure:"http-port"`
+	DatabaseConnection string `mapstructure:"database-url"`
 }
 
 var defaultConfiguration = &Configuration{}

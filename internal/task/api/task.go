@@ -3,6 +3,7 @@ package api
 import (
 	"time"
 
+	"bitbucket.org/uthark/yttrium/internal/config"
 	"bitbucket.org/uthark/yttrium/internal/task/repo"
 	"bitbucket.org/uthark/yttrium/internal/types"
 )
@@ -15,7 +16,7 @@ type TaskAPI struct {
 // NewTaskAPI creates new API to work with tasks.
 func NewTaskAPI() *TaskAPI {
 	return &TaskAPI{
-		repo: repo.NewTaskRepository("localhost:27017"),
+		repo: repo.NewTaskRepository(config.DefaultConfiguration().DatabaseConnection),
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"bitbucket.org/uthark/yttrium/internal/config"
 	"bitbucket.org/uthark/yttrium/internal/util"
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -24,7 +25,6 @@ func initConfig() {
 	replacer := strings.NewReplacer("-", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	viper.AutomaticEnv()
-
 	// read configuration.
 	if cfgFile != "" {
 		// Use config file from the flag.
@@ -39,7 +39,22 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		logger.Println("No config file found: ", err)
 	}
+	logger.Println("Config file used: ", viper.ConfigFileUsed())
 	logger.Println("Current configuration:", viper.AllSettings())
+
+	viper.WatchConfig()
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		logger.Println("Config file changed:", e.Name, e.Op, e)
+		c := &config.Configuration{}
+		err := viper.Unmarshal(c)
+		if err != nil {
+			logger.Println("Unable to unmarshal config:", err)
+		}
+		config.SetDefaultConfiguration(c)
+		logger.Println(c)
+		restartServer()
+	})
+
 	c := &config.Configuration{}
 	util.Must(viper.Unmarshal(c))
 	config.SetDefaultConfiguration(c)

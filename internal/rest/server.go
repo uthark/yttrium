@@ -19,20 +19,48 @@ import (
 
 // Server is a HTTP server.
 type Server struct {
-	Port uint16
+	Port   uint16
+	server *http.Server
+	stop   chan int
 }
 
 // NewServer creates new instance of server.
 func NewServer() *Server {
 	return &Server{}
 }
+func (s *Server) Restart() {
+	logger.Println("Restarting server")
+	s.Stop()
+	go s.Start()
+}
 
-// Start creates RESTful container and starts  accepting HTTP requests.
-func (s *Server) Start() error {
+func (s *Server) Init(stop chan int) {
 	logger.Println("Configuring HTTP server.")
+
+	s.setupSignalHandler()
+	s.stop = stop
+
 	restful.SetLogger(logger)
 	restful.DefaultResponseContentType(restful.MIME_JSON)
 	restful.RegisterEntityAccessor(mime.MediaTypeApplicationYaml, NewYamlReaderWriter(mime.MediaTypeApplicationYaml))
+
+}
+
+func (s *Server) Stop() {
+	logger.Println("Stopping server.")
+	ctx := context.TODO()
+	err := s.server.Shutdown(ctx)
+	if err != nil {
+		logger.Println(err)
+	}
+	logger.Println("Server stopped")
+}
+
+// Start creates RESTful container and starts  accepting HTTP requests.
+func (s *Server) Start() {
+	logger.Println("Starting server.")
+	address := fmt.Sprintf(":%d", config.DefaultConfiguration().HTTPPort)
+	logger.Println("Starting listening on ", address)
 
 	c := restful.NewContainer()
 	c.ServeMux = http.NewServeMux()
@@ -45,17 +73,18 @@ func (s *Server) Start() error {
 	c = c.Add(prom.NewService())
 	c = c.Add(taskrest.NewService())
 
-	address := fmt.Sprintf(":%d", config.DefaultConfiguration().HTTPPort)
-	logger.Println("Staring listening on ", address)
 	server := &http.Server{
 		Addr:     address,
 		Handler:  c,
 		ErrorLog: logger,
 	}
+	s.server = server
 
-	s.setupSignalHandler(server)
+	err := server.ListenAndServe()
+	if err != nil {
+		logger.Println(err)
+	}
 
-	return server.ListenAndServe()
 }
 
 // webserviceLogging logs requested HTTP URL and method
@@ -79,26 +108,26 @@ func updateMetrics(req *restful.Request, resp *restful.Response, chain *restful.
 }
 
 // setupSignalHandler listens for syscall signals and stops HTTP server.
-func (s Server) setupSignalHandler(server *http.Server) {
+func (s *Server) setupSignalHandler() {
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT)
 	go func() {
-		s := <-c
-		logger.Println("Got signal:", s)
-		if s == syscall.SIGTERM || s == syscall.SIGINT || s == os.Interrupt {
+		sig := <-c
+		logger.Println("Got signal:", sig)
+		if sig == syscall.SIGTERM || sig == syscall.SIGINT || sig == os.Interrupt {
 			logger.Println("Safe Shutting down.")
 			ctx := context.Background()
-			err := server.Shutdown(ctx)
+			err := s.server.Shutdown(ctx)
 			if err != nil {
 				logger.Println("Failed to shutdown server: ", err)
 			}
-		} else if s == syscall.SIGKILL {
+		} else if sig == syscall.SIGKILL {
 			logger.Println("Closing server.")
-			err := server.Close()
+			err := s.server.Close()
 			if err != nil {
 				logger.Println("Failed to forcibly close server: ", err)
 			}
 		}
-		os.Exit(2)
+		s.stop <- 1
 	}()
 }
