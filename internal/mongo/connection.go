@@ -5,7 +5,7 @@ import (
 	"net"
 	"strings"
 
-	"gopkg.in/mgo.v2"
+	"github.com/globalsign/mgo"
 )
 
 // ParseURL parses connection string and returns dial info.

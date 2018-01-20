@@ -16,7 +16,7 @@ func NewService() *restful.WebService {
 	ws = ws.
 		Path("/task").
 		Doc("Endpoint to manipulate tasks.").
-		Produces(mime.MediaTypeApplicationYaml, restful.MIME_JSON)
+		Produces(restful.MIME_JSON, mime.MediaTypeApplicationYaml)
 
 	rest := TaskREST{
 		api: api.NewTaskAPI(),

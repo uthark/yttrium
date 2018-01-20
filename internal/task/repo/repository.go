@@ -6,7 +6,17 @@ import (
 
 	"bitbucket.org/uthark/yttrium/internal/mongo"
 	"bitbucket.org/uthark/yttrium/internal/types"
-	"gopkg.in/mgo.v2"
+	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
+	"github.com/google/uuid"
+)
+
+const (
+	// TaskCollection is a name of collection for storing tasks.
+	TaskCollection string = "tasks"
+
+	//LimitDefault specifies default limit for FindAll operation
+	LimitDefault int = 1000
 )
 
 // TaskRepository is a repository to access tasks.
@@ -24,13 +34,42 @@ type TaskRepositoryImpl struct {
 }
 
 // Save saves a task into a database.
-func (t TaskRepositoryImpl) Save(task *types.Task) (*types.Task, error) {
-	return task, nil
+func (t TaskRepositoryImpl) Save(data *types.Task) (*types.Task, error) {
+
+	session, collection := t.getTaskCollection()
+	defer session.Close()
+
+	if data.ID == "" {
+		logger.Println("Saving new task", data)
+
+		// new data
+		// populating essentials
+		data.DateAdded = time.Now()
+		ID := uuid.New().String()
+		data.ID = ID
+		logger.Println("Assigning ID to task:", data.ID)
+
+		err := collection.Insert(data)
+		return data, err
+	}
+
+	logger.Println("Updating existing task", *data)
+
+	err := collection.Update(byID(data.ID), data)
+	return data, err
+
 }
 
 // List lists all tasks in a database.
 func (t TaskRepositoryImpl) List() ([]*types.Task, error) {
-	return nil, nil
+	logger.Println("Getting all tasks.")
+	session, collection := t.getTaskCollection()
+	defer session.Close()
+
+	var result []*types.Task
+	q := bson.M{}
+	err := collection.Find(q).Limit(LimitDefault).All(&result)
+	return result, err
 }
 
 // NewTaskRepository creates new task repository.
@@ -45,7 +84,7 @@ func NewTaskRepository(mongoURL string) TaskRepository {
 
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
-		panic(fmt.Errorf("Can't connect to mongo db: %v", err))
+		panic(fmt.Errorf("can't connect to mongo db: %v", err))
 	}
 	session.SetMode(mgo.Primary, false)
 
@@ -53,4 +92,18 @@ func NewTaskRepository(mongoURL string) TaskRepository {
 		dialInfo: dialInfo,
 		session:  session,
 	}
+}
+
+func byID(id string) bson.M {
+	return bson.M{"_id": id}
+}
+
+func (t TaskRepositoryImpl) getTaskCollection() (session *mgo.Session, collection *mgo.Collection) {
+	session = t.session.Copy()
+
+	// use database provided in connection URL to connect.
+	db := session.DB("")
+
+	collection = db.C(TaskCollection)
+	return session, collection
 }
