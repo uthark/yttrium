@@ -1,11 +1,11 @@
-FROM alpine:latest
+FROM alpine:3.7
 
-LABEL "maintainer" "Oleg Atamanenko"
+LABEL "MAINTAINER"="Oleg Atamanenko <oleg.atamanenko@gmail.com>"
 
 USER 1001
 
-ADD yttrium /yttrium
+COPY yttrium /yttrium
 
 EXPOSE 8080
 
-ENTRYPOINT exec /yttrium
+ENTRYPOINT ["/yttrium"]

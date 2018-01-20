@@ -84,7 +84,7 @@ func NewTaskRepository(mongoURL string) TaskRepository {
 
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
-		panic(fmt.Errorf("can't connect to mongo db: %v", err))
+		panic(fmt.Errorf("can't connect to mongo db: %s: %v", mongoURL, err))
 	}
 	session.SetMode(mgo.Primary, false)
 
