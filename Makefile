@@ -54,7 +54,7 @@ linux-build: set-linux-env build
 
 
 .PHONY: docker-build
-docker-build: linux-build
+docker-build: # linux-build
 	docker build --pull -t uthark/$(name):$(version)-$(GITCOMMIT) -f build/Dockerfile .
 
 

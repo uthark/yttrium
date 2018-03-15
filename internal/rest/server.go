@@ -13,7 +13,6 @@ import (
 	"bitbucket.org/uthark/yttrium/internal/config"
 	"bitbucket.org/uthark/yttrium/internal/mime"
 	"bitbucket.org/uthark/yttrium/internal/prom"
-	taskrest "bitbucket.org/uthark/yttrium/internal/task/rest"
 	"github.com/emicklei/go-restful"
 )
 
@@ -61,7 +60,7 @@ func (s *Server) Start() {
 		c.Filter(webserviceLogging)
 	}
 	c = c.Add(prom.NewService())
-	c = c.Add(taskrest.NewService())
+	//c = c.Add(taskrest.NewService())
 
 	server := &http.Server{
 		Addr:     address,
