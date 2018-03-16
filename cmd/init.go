@@ -3,8 +3,8 @@ package cmd
 import (
 	"strings"
 
-	"bitbucket.org/uthark/yttrium/internal/config"
-	"bitbucket.org/uthark/yttrium/internal/util"
+	"github.com/uthark/yttrium/internal/config"
+	"github.com/uthark/yttrium/internal/util"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

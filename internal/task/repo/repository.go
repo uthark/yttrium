@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"bitbucket.org/uthark/yttrium/internal/mongo"
-	"bitbucket.org/uthark/yttrium/internal/types"
+	"github.com/uthark/yttrium/internal/mongo"
+	"github.com/uthark/yttrium/internal/types"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 	"github.com/google/uuid"

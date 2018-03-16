@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"bitbucket.org/uthark/yttrium/cmd"
+	"github.com/uthark/yttrium/cmd"
 )
 
 func main() {

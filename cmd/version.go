@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"bitbucket.org/uthark/yttrium/internal/version"
+	"github.com/uthark/yttrium/internal/version"
 	"github.com/spf13/cobra"
 )
 

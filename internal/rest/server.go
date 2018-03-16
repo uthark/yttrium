@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"bitbucket.org/uthark/yttrium/internal/config"
-	"bitbucket.org/uthark/yttrium/internal/mime"
-	"bitbucket.org/uthark/yttrium/internal/prom"
+	"github.com/uthark/yttrium/internal/config"
+	"github.com/uthark/yttrium/internal/mime"
+	"github.com/uthark/yttrium/internal/prom"
 	"github.com/emicklei/go-restful"
 )
 

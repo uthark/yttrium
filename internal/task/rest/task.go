@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"bitbucket.org/uthark/yttrium/internal/mime"
-	"bitbucket.org/uthark/yttrium/internal/task/api"
-	"bitbucket.org/uthark/yttrium/internal/types"
+	"github.com/uthark/yttrium/internal/mime"
+	"github.com/uthark/yttrium/internal/task/api"
+	"github.com/uthark/yttrium/internal/types"
 	"github.com/emicklei/go-restful"
 )
 

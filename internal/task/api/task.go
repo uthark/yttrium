@@ -3,9 +3,9 @@ package api
 import (
 	"time"
 
-	"bitbucket.org/uthark/yttrium/internal/config"
-	"bitbucket.org/uthark/yttrium/internal/task/repo"
-	"bitbucket.org/uthark/yttrium/internal/types"
+	"github.com/uthark/yttrium/internal/config"
+	"github.com/uthark/yttrium/internal/task/repo"
+	"github.com/uthark/yttrium/internal/types"
 )
 
 // TaskAPI is an API to work with tasks.

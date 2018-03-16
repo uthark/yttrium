@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"bitbucket.org/uthark/yttrium/internal/rest"
+	"github.com/uthark/yttrium/internal/rest"
 	"github.com/spf13/cobra"
 )
 
