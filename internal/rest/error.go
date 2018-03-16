@@ -54,6 +54,14 @@ func notFound(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(http.StatusNotFound)
 }
 
+func healthcheck(resp http.ResponseWriter, req *http.Request) {
+	logger.Println(req.URL, http.StatusOK)
+	setContentTypeApplicationJSON(resp)
+	resp.WriteHeader(http.StatusOK)
+	resp.Write([]byte("{\"status\":\"ok\"}"))
+
+}
+
 func setContentTypeApplicationJSON(httpWriter http.ResponseWriter) {
 	httpWriter.Header().Set("Content-Type", restful.MIME_JSON)
 }

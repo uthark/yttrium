@@ -54,6 +54,7 @@ func (s *Server) Start() {
 	c.RecoverHandler(recoveryHandler)
 	c.ServiceErrorHandler(serviceErrorHandler)
 	c.Handle("/", http.HandlerFunc(notFound))
+	c.Handle("/health", http.HandlerFunc(healthcheck))
 	c.Filter(updateMetrics)
 	tracing := config.DefaultConfiguration().HTTPTracing
 	if tracing {
