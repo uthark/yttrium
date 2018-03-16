@@ -47,14 +47,14 @@ prepare-tools:
 
 .PHONY: set-linux-env
 set-linux-env:
-	GOOS=linux
+	$(eval GOOS = linux)
 
 .PHONY: linux-build
 linux-build: set-linux-env build
 
 
 .PHONY: docker-build
-docker-build: # linux-build
+docker-build: linux-build
 	docker build --pull -t uthark/$(name):$(version)-$(GITCOMMIT) -f build/Dockerfile .
 
 
