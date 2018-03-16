@@ -34,6 +34,8 @@ Further PR's (with tests) are welcome, but please maintain backwards compatibili
 * Minimise socket connection timeouts due to excessive locking ([details](https://github.com/globalsign/mgo/pull/52))
 * Natively support X509 client authentication ([details](https://github.com/globalsign/mgo/pull/55))
 * Gracefully recover from a temporarily unreachable server ([details](https://github.com/globalsign/mgo/pull/69))
+* Use JSON tags when no explicit BSON are tags set ([details](https://github.com/globalsign/mgo/pull/91))
+* Support [$changeStream](https://docs.mongodb.com/manual/changeStreams/) tailing on 3.6+ ([details](https://github.com/globalsign/mgo/pull/97))
 
 ---
 
@@ -51,6 +53,8 @@ Further PR's (with tests) are welcome, but please maintain backwards compatibili
 * @jameinel
 * @gazoon
 * @mapete94
+* @peterdeka
 * @Reenjii
 * @smoya
+* @steve-gray
 * @wgallagher
